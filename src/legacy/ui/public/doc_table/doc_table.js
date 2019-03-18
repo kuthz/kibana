@@ -42,6 +42,7 @@ uiModules.get('kibana')
         searchSource: '=?',
         infiniteScroll: '=?',
         filter: '=?',
+        onRowClick: '=?',
         filters: '=?',
         minimumVisibleRows: '=?',
         onAddColumn: '=?',
@@ -52,6 +53,8 @@ uiModules.get('kibana')
       },
       link: function ($scope, $el) {
         const notify = new Notifier();
+
+        console.log('search source is ', JSON.stringify($scope.searchSource));
 
         $scope.$watch('minimumVisibleRows', (minimumVisibleRows) => {
           $scope.limit = Math.max(minimumVisibleRows || 50, $scope.limit || 50);
@@ -91,8 +94,14 @@ uiModules.get('kibana')
           if ($scope.columns.length === 0) $scope.columns.push('_source');
         });
 
-        $scope.$watch('searchSource', function () {
+
+        function onSearchSourceUpdated() {
+
+          console.log('doctable:onSearchSourceUpdated ');
+
           if (!$scope.searchSource) return;
+
+          console.log('search source is ', JSON.stringify($scope.searchSource));
 
           $scope.indexPattern = $scope.searchSource.getField('index');
 
@@ -131,7 +140,7 @@ uiModules.get('kibana')
             return $scope.searchSource.onResults().then(onResults);
           }
 
-          function startSearching() {
+          function startSearching() {console.log('start searching');
             let inspectorRequest = undefined;
             if (_.has($scope, 'inspectorAdapters.requests')) {
               $scope.inspectorAdapters.requests.reset();
@@ -164,7 +173,10 @@ uiModules.get('kibana')
           }
           startSearching();
           courier.fetch();
-        });
+        }
+
+        console.log('doctable:set up watch ');
+        $scope.$watch('searchSource', onSearchSourceUpdated);
 
         $scope.pageOfItems = [];
         $scope.onPageNext = () => {

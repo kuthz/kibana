@@ -88,12 +88,12 @@ const VisFiltersProvider = (Private, getAppState) => {
   const queryFilter = Private(FilterBarQueryFilterProvider);
 
   const pushFilters = (filters, simulate) => {
-    const appState = getAppState();
-    if (filters.length && !simulate) {
-      const flatFilters = _.flatten(filters);
-      const deduplicatedFilters = flatFilters.filter((v, i) => i === flatFilters.findIndex(f => _.isEqual(v, f)));
-      filterBarPushFilters(appState)(deduplicatedFilters);
-    }
+    // const appState = getAppState();
+    // if (filters.length && !simulate) {
+    //   const flatFilters = _.flatten(filters);
+    //   const deduplicatedFilters = flatFilters.filter((v, i) => i === flatFilters.findIndex(f => _.isEqual(v, f)));
+    //   filterBarPushFilters(appState)(deduplicatedFilters);
+    // }
   };
 
   const filter = (event, { simulate = false } = {}) => {

@@ -19,10 +19,9 @@
 
 import { i18n } from '@kbn/i18n';
 import _ from 'lodash';
+import { GridData, PanelState } from 'plugins/dashboard_embeddable';
 import chrome from 'ui/chrome';
 import { DEFAULT_PANEL_HEIGHT, DEFAULT_PANEL_WIDTH } from '../dashboard_constants';
-import { PanelState } from '../selectors';
-import { GridData } from '../types';
 
 const PANEL_HEIGHT_SCALE_FACTOR = 5;
 const PANEL_HEIGHT_SCALE_FACTOR_WITH_MARGINS = 4;

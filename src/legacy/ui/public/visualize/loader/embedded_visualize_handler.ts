@@ -16,11 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 import { EventEmitter } from 'events';
 import { debounce, forEach, get } from 'lodash';
 import * as Rx from 'rxjs';
 import { share } from 'rxjs/operators';
+// @ts-ignore
+import { createFilter } from 'ui/vis/vis_filters';
 // @ts-ignore untyped dependency
 import { registries } from '../../../../core_plugins/interpreter/public/registries';
 import { Inspector } from '../../inspector';
@@ -39,6 +40,7 @@ import { DataAdapter, RequestAdapter } from '../../inspector/adapters';
 
 import { getTableAggs } from './pipeline_helpers/utilities';
 import {
+  Filter,
   VisResponseData,
   VisSavedObject,
   VisualizeLoaderParams,
@@ -192,7 +194,18 @@ export class EmbeddedVisualizeHandler {
     this.vis.eventsSubject = this.handlers.eventsSubject;
     this.events$ = this.handlers.eventsSubject.asObservable().pipe(share());
     this.events$.subscribe(event => {
-      if (this.actions[event.name]) {
+      if (event.name === 'filterBucket') {
+        event.data.aggConfigs = getTableAggs(this.vis);
+        this.filterListener(
+          createFilter(
+            event.data.aggConfigs,
+            event.data.data[0].table,
+            event.data.data[0].column,
+            event.data.data[0].row,
+            event.data.data[0].value
+          )
+        );
+      } else if (this.actions[event.name]) {
         event.data.aggConfigs = getTableAggs(this.vis);
         this.actions[event.name](event.data);
       }
@@ -233,6 +246,8 @@ export class EmbeddedVisualizeHandler {
     if (params.hasOwnProperty('filters')) {
       fetchRequired = true;
       this.dataLoaderParams.filters = params.filters;
+
+      // this.filterListener(params.filters);
     }
     if (params.hasOwnProperty('query')) {
       fetchRequired = true;
@@ -242,6 +257,10 @@ export class EmbeddedVisualizeHandler {
     if (fetchRequired) {
       this.fetchAndRender();
     }
+  }
+
+  public onFilter(filterListener: (filters: Filter[]) => void) {
+    this.filterListener = filterListener;
   }
 
   /**
